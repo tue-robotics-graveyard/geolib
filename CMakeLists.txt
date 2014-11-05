@@ -1,63 +1,65 @@
 cmake_minimum_required(VERSION 2.8.3)
-project(geolib2)
-
-find_package(catkin REQUIRED COMPONENTS
-  code_profiler
-  cv_bridge
-  roscpp
-  tf
-)
+project(geolib)
 
 find_package(OpenCV REQUIRED)
 
-catkin_package(
-  INCLUDE_DIRS include
-  LIBRARIES geolib
-  CATKIN_DEPENDS code_profiler cv_bridge roscpp tf
-)
-
-###########
-## Build ##
-###########
+# ------------------------------------------------------------------------------------------------
+#                                                BUILD
+# ------------------------------------------------------------------------------------------------
 
 include_directories(
   include
-  ${catkin_INCLUDE_DIRS}
-
+  ${OpenCV_INCLUDE_DIRS}
 )
-include_directories(${OpenCV_INCLUDE_DIRS})
-
-# to show header files in Qt Creator
-file(GLOB_RECURSE HEADER_FILES include/*.h)
 
 if(EXISTS "/usr/include/assimp/Importer.hpp")
     add_definitions(-DASSIMP_VERSION_3)
 endif()
 
-## Declare a cpp library
-add_library(geolib   src/Box.cpp
-                     src/datatypes.cpp
-                     src/Octree.cpp
-                     src/OctreeNode.cpp
-                     src/Ray.cpp
-                     src/Shape.cpp
-                     src/Mesh.cpp
-                     src/CompositeShape.cpp
-                     src/Triangle.cpp
-                     src/HeightMap.cpp
-                     src/HeightMapNode.cpp
+set(HEADER_FILES
+    include/geolib/math_types.h
+    include/geolib/Ray.h
+    include/geolib/serialization.h
+    include/geolib/visualization.h
+    include/geolib/datatypes.h
+    include/geolib/ros/msg_conversions.h
+    include/geolib/ros/tf_conversions.h
+    include/geolib/Importer.h
+    include/geolib/matrix.h
+    include/geolib/Triangle.h
+    include/geolib/Box.h
+    include/geolib/HeightMapNode.h
+    include/geolib/Octree.h
+    include/geolib/Shape.h
+    include/geolib/sensors/LaserRangeFinder.h
+    include/geolib/sensors/DepthCamera.h
+    include/geolib/Mesh.h
+    include/geolib/OctreeNode.h
+    include/geolib/CompositeShape.h
+    include/geolib/HeightMap.h
+)
 
-                     src/sensors/DepthCamera.cpp
-                     src/sensors/LaserRangeFinder.cpp
+add_library(geolib
+    src/Box.cpp
+    src/datatypes.cpp
+    src/Octree.cpp
+    src/OctreeNode.cpp
+    src/Ray.cpp
+    src/Shape.cpp
+    src/Mesh.cpp
+    src/CompositeShape.cpp
+    src/Triangle.cpp
+    src/HeightMap.cpp
+    src/HeightMapNode.cpp
+    src/sensors/DepthCamera.cpp
+    src/sensors/LaserRangeFinder.cpp
+    src/Importer.cpp
+    src/serialization.cpp
+    src/visualization.cpp                     
+    ${HEADER_FILES}
+)
 
-                     src/Importer.cpp
-                     
-                     src/serialization.cpp
-                     src/visualization.cpp
-                     
-                     ${HEADER_FILES})
-
-target_link_libraries(geolib assimp ${catkin_LIBRARIES} ${OpenCV_LIBRARIES})
+target_link_libraries(geolib assimp ${OpenCV_LIBRARIES})
 
 add_executable(show src/show.cpp)
 target_link_libraries(show geolib)
@@ -73,7 +75,7 @@ target_link_libraries(height-map-to-shape geolib)
 #                                                TESTS
 # ------------------------------------------------------------------------------------------------
 
-add_executable(test_geolib test/test_geolib.cpp)
-target_link_libraries(test_geolib geolib assimp)
+# add_executable(test_geolib test/test_geolib.cpp)
+# target_link_libraries(test_geolib geolib assimp)
 
-add_executable(test_matrix test/test_matrix.cpp)
+# add_executable(test_matrix test/test_matrix.cpp)
